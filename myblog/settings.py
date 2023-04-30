@@ -69,8 +69,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'myblog.wsgi.application'
-LOGIN_REDIRECT_URL = '/posts/list/'
-LOGOUT_REDIRECT_URL = '/posts'
+LOGIN_REDIRECT_URL = '/posts'
+LOGOUT_REDIRECT_URL = '/'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 

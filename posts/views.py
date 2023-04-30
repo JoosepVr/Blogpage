@@ -1,9 +1,12 @@
 from django.shortcuts import render,redirect
 from posts.models import Post
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .forms import PostForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import PostForm, SignUpForm
+
 # this library is used for debugging
 import pdb
 
@@ -13,30 +16,56 @@ def home(request):
     recent_posts = Post.objects.all().order_by('-created_date')
     return render(request, 'home.html', {'posts': recent_posts})
 
+
+class HomeView(ListView):
+
+    model = Post
+    template_name = 'home.html'
+    success_url = reverse_lazy('/')
+    context_object_name = 'posts'
+
+
+#Method1
+# class PostListView(LoginRequiredMixin,View):
+#     def get(self, request):
+#         recent_posts = Post.objects.all()
+#         return render(request, 'posts.html', {'posts': recent_posts})
+
+
+#Method2
+class PostListView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'posts.html'
+    success_url = reverse_lazy('posts')
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(author=self.request.user)
+
 # decorator for only authenticated users
-@login_required
-def posts(request):
-    # filter posts to list only for login in user
-    p = Post.objects.filter(author=request.user)
-    return render(request, 'posts.html', {'posts': p})
+# @login_required
+# def posts(request):
+#     # filter posts to list only for login in user
+#     p = Post.objects.filter(author=request.user)
+#     return render(request, 'posts.html', {'posts': p})
 
 # Function Based Views
-# @login_required
-# def post_create(request):
-#     if request.method == 'POST':
-#         pdb.set_trace()
-#         form = PostForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             post.author = request.user
-#             post.save()
-#             return redirect('posts')
-#     else:
-#         form = PostForm()
-#     return render(request, 'create_post.html', {'form': form})
+@login_required
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('posts')
+    else:
+        form = PostForm()
+    return render(request, 'create_post.html', {'form': form})
+
 
 # Class Based views
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     template_name = 'create_post.html'
     fields = ['title','text']
@@ -46,7 +75,8 @@ class PostCreateView(CreateView):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class PostUpdateView(UpdateView):
+
+class PostUpdateView(LoginRequiredMixin,UpdateView):
     model = Post
     template_name = 'update_post.html'
     fields = ['title','text']
@@ -57,8 +87,29 @@ class PostUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-class PostDeleteView(DeleteView):
+class PostDeleteView(LoginRequiredMixin,DeleteView):
     model = Post
     template_name = 'post_delete.html'
-    context_object_name = 'post'
     success_url = reverse_lazy('posts')
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = SignUpForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+
+class UserCreateView(CreateView):
+    model = User
+    template_name = 'registration/signup.html'
+    form_class = SignUpForm
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
