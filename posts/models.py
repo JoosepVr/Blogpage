@@ -1,5 +1,8 @@
 from django.db import models
 from django.utils import timezone
+from django.apps import AppConfig
+
+default_app_config = 'posts.apps.PostsConfig'
 
 
 class Post(models.Model):
