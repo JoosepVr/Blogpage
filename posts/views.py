@@ -102,3 +102,9 @@ class UserCreateView(CreateView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+class AboutView(ListView):
+    model = Post
+    template_name = 'about_me.html'
+    success_url = reverse_lazy("about_me")
+    context_object_name = "posts"
