@@ -1,5 +1,6 @@
 """
 URL configuration for myblog project.
+
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
 Examples:
@@ -15,14 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from myblog.views import AboutView, UserCreateView, HomeView
+from .views import about, contact, home
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", HomeView.as_view(), name="home"),
-    path("", include("posts.urls")),
-    path("accounts/", include("django.contrib.auth.urls")),
-    path("about_me/", AboutView.as_view(), name="about_me"),
-    path("accounts/signup/", UserCreateView.as_view(), name="signup"),
+    path('', home, name='home'),
+    path('about/', about, name='about'),
+    path('contact/', contact, name='contact'),
+    path('posts/', include('posts.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+ {% block content %}
+
+
+    <div class="col-sm-9">
+      <h4><small>All POSTS</small></h4>
+      {% for entry in posts %}
+      <div class="row">
+        <div class="col-lg-12">
+        <h2>{{entry.title}}</h2>
+         <h5><span class="glyphicon glyphicon-time"></span> Post by {{entry.author.username}}, {{entry.created_date}}.</h5>
+        <h5><span class="label label-danger">Food</span> <span class="label label-primary">Ipsum</span></h5><br>
+        <p>   {{entry.text}}   <br><br>
+              <a href="{% url 'post_update' entry.pk%}" class="btn btn-info">Update</a>
+              <a href="{% url 'post_delete' entry.pk%}" class="btn btn-danger">Delete</a>
+        </div>
+
+      </div>
+      {% endfor %}
+
+
+
+
+    </div>
+
+
+
+{% endblock %}

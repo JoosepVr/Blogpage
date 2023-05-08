@@ -1,10 +1,6 @@
+# Create your models here.
 from django.db import models
 from django.utils import timezone
-from django.apps import AppConfig
-
-default_app_config = 'posts.apps.PostsConfig'
-
-
 class Post(models.Model):
     author = models.ForeignKey(
         'auth.User',
@@ -12,6 +8,8 @@ class Post(models.Model):
     )
     title = models.CharField(max_length=200)
     text = models.TextField()
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    is_featured = models.BooleanField(default=False)
     created_date = models.DateTimeField(
         default=timezone.now
     )
@@ -20,4 +18,4 @@ class Post(models.Model):
     )
 
     def __str__(self):
-        return self.text
+        return self.title

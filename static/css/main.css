@@ -1,0 +1,9 @@
+.header-image{
+    background-image:url('/static/img/header.jpg')
+}
+footer{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    padding:20px;
+}
