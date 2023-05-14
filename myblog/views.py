@@ -4,8 +4,9 @@ from posts.models import Post
 
 
 def home(request):
+    featured_post = Post.objects.filter(is_featured=True)
     recent_posts = Post.objects.all().order_by('-created_date')
-    return render(request, 'home.html', {'posts': recent_posts})
+    return render(request, 'home.html', {'posts': recent_posts, 'featured_post': featured_post})
 
 def about(request):
     return render(request, 'about.html')

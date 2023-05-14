@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from posts.models import Post
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
@@ -35,6 +36,16 @@ import pdb
 
 
 #Method2
+# class PostListView(LoginRequiredMixin, ListView):
+#     model = Post
+#     template_name = 'posts/posts.html'
+#     success_url = reverse_lazy('list_posts')
+#     context_object_name = 'posts'
+#
+#     def get_queryset(self):
+#         return super().get_queryset().filter(author=self.request.user)
+
+# Method with Search
 class PostListView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'posts/posts.html'
@@ -42,7 +53,12 @@ class PostListView(LoginRequiredMixin, ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        return super().get_queryset().filter(author=self.request.user)
+        queryset = super().get_queryset().filter(author=self.request.user)
+        query = self.request.GET.get('query')
+        if query:
+            queryset = queryset.filter(Q(title__icontains=query) | Q(text__icontains=query))
+        return queryset
+
 
 # decorator for only authenticated users
 # @login_required
@@ -70,7 +86,7 @@ def post_create(request):
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     template_name = 'posts/create_post.html'
-    fields = ['title', 'text', 'image', 'is_featured']
+    fields = ['title','text', 'image', 'is_featured']
     success_url = reverse_lazy('list_posts')
 
     def form_valid(self, form):
@@ -87,7 +103,6 @@ class PostUpdateView(LoginRequiredMixin,UpdateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
-
 
 class PostDeleteView(LoginRequiredMixin,DeleteView):
     model = Post
