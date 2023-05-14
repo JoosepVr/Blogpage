@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import PostForm, SignUpForm
 from rest_framework import viewsets
-from posts.serializers import PostSerializer
+from .serializers import PostSerializer
 
 # this library is used for debugging
 import pdb
@@ -137,4 +137,4 @@ class UserCreateView(CreateView):
 # Rest API
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by("title")
-    serialize_class = PostSerializer
+    serializer_class = PostSerializer
