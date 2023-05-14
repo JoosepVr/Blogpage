@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect
 from posts.models import Post
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -7,6 +7,9 @@ from django.views.generic import CreateView, ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import PostForm, SignUpForm
+from rest_framework import viewsets
+from posts.serializers import PostSerializer
+
 # this library is used for debugging
 import pdb
 
@@ -94,17 +97,17 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class PostUpdateView(LoginRequiredMixin,UpdateView):
+class PostUpdateView(LoginRequiredMixin, UpdateView):
     model = Post
     template_name = 'posts/update_post.html'
-    fields = ['title','text', 'image', 'is_featured']
+    fields = ['title', 'text', 'image', 'is_featured']
     success_url = reverse_lazy('list_posts')
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
 
-class PostDeleteView(LoginRequiredMixin,DeleteView):
+class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'posts/post_delete.html'
     success_url = reverse_lazy('list_posts')
@@ -130,3 +133,8 @@ class UserCreateView(CreateView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+# Rest API
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all().order_by("title")
+    serialize_class = PostSerializer
