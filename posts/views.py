@@ -137,4 +137,4 @@ class UserCreateView(CreateView):
 # Rest API
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by("title")
-    serialize_class = PostSerializer
+    serializer_class = PostSerializer
